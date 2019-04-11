@@ -1,53 +1,48 @@
 $(document).ready(function () {
-    var meetings = [
-        { "organizer": "Abc", "duration": "30" },
-        { "organizer": "Def", "duration": "60" },
-        { "organizer": "Ghi", "duration": "120" },
-        { "organizer": "Jkl", "duration": "5" },
-        { "organizer": "Mno", "duration": "30" },
-        { "organizer": "Pqr", "duration": "60" },
-        { "organizer": "Sto", "duration": "75" },
-        { "organizer": "Uvw", "duration": "90" },
-        { "organizer": "Xyz", "duration": "30" },
-        { "organizer": "Bcd", "duration": "45" },
-        { "organizer": "Efg", "duration": "60" },
-        { "organizer": "Fgh", "duration": "30" },
-        { "organizer": "Swo", "duration": "150" },
-        { "organizer": "Tgb", "duration": "180" },
-        { "organizer": "Okm", "duration": "240" }
-    ],
-        meetingRooms = [],
-        morningStart = 9,
-        afternoonStart = 1,
-        sessionDuration=[180, 240];
-    
-    let sortedMeetings = meetings.slice(0).sort((a, b) => b.duration - a.duration);
+    start();
+});
+
+var meetings = [
+    { "organizer": "Abc", "duration": "30" },
+    { "organizer": "Def", "duration": "60" },
+    { "organizer": "Ghi", "duration": "120" },
+    { "organizer": "Jkl", "duration": "5" },
+    { "organizer": "Mno", "duration": "30" },
+    { "organizer": "Pqr", "duration": "60" },
+    { "organizer": "Sto", "duration": "75" },
+    { "organizer": "Uvw", "duration": "90" },
+    { "organizer": "Xyz", "duration": "30" },
+    { "organizer": "Bcd", "duration": "45" },
+    { "organizer": "Efg", "duration": "60" },
+    { "organizer": "Fgh", "duration": "30" },
+    { "organizer": "Swo", "duration": "150" },
+    { "organizer": "Tgb", "duration": "180" },
+    { "organizer": "Okm", "duration": "240" }
+],
+    meetingRooms = [],
+    morningStart = 9,
+    afternoonStart = 1,
+    sessionDuration=[180, 240];
+
+let sortedMeetings = meetings.slice(0).sort((a, b) => b.duration - a.duration);
+
+function start(){
 
     $.each(sortedMeetings, function (index, value) {
         meetingRooms.push({ room: [], durationAvaialble: [180, 240] });       
         $.each(meetingRooms, function (index, rooms) {            
             if (value.duration <= rooms.durationAvaialble[0]) {
-                if(rooms.durationAvaialble[0] == sessionDuration[0]){
-                    value["startTime"]=convertMinutesToHHMM(morningStart*60);
-                    value["endTime"]=convertMinutesToHHMM((morningStart*60)+Number(value.duration));
-                }else if(rooms.durationAvaialble[0] != sessionDuration[0]){
-                    var tempStartTime=(morningStart*60)+(sessionDuration[0]-rooms.durationAvaialble[0]);
-                    value["startTime"]=convertMinutesToHHMM(tempStartTime);
-                    value["endTime"]=convertMinutesToHHMM(tempStartTime+Number(value.duration));
-                }
+                var startEndTime=calculateTiming(rooms.durationAvaialble[0],value.duration,0,morningStart)
+                value["startTime"]=startEndTime.startTime;
+                value["endTime"]=startEndTime.endTime
                 rooms.durationAvaialble[0] = rooms.durationAvaialble[0] - Number(value.duration);;
                 value["time"] = "Morning";
                 rooms.room.push(value);
                 return false;
             } else if (value.duration <= rooms.durationAvaialble[1]) {
-                if(rooms.durationAvaialble[1] == sessionDuration[1]){
-                    value["startTime"]=convertMinutesToHHMM(afternoonStart*60);
-                    value["endTime"]=convertMinutesToHHMM((afternoonStart*60)+Number(value.duration));
-                }else if(rooms.durationAvaialble[1] != sessionDuration[1]){
-                    var tempStartTime=(afternoonStart*60)+(sessionDuration[1]-rooms.durationAvaialble[1]);
-                    value["startTime"]=convertMinutesToHHMM(tempStartTime);
-                    value["endTime"]=convertMinutesToHHMM(tempStartTime+Number(value.duration));
-                }
+                var startEndTime=calculateTiming(rooms.durationAvaialble[1],value.duration,1,afternoonStart)
+                value["startTime"]=startEndTime.startTime;
+                value["endTime"]=startEndTime.endTime
                 rooms.durationAvaialble[1] = rooms.durationAvaialble[1] - value.duration;
                 value["time"] = "Afternoon";
                 rooms.room.push(value);
@@ -58,8 +53,7 @@ $(document).ready(function () {
 
         })
 
-    });
-    
+    });   
     //display Logic
     $.each(meetingRooms, function (index, value) {
         if (value.room.length != 0) {
@@ -79,8 +73,25 @@ $(document).ready(function () {
             });
         }
     }); 
+}
 
-});
+// calculate start and end time
+function calculateTiming(durationAvailable,meetingDuration,index,session){
+
+    if(durationAvailable == sessionDuration[index]){
+        var startTime=convertMinutesToHHMM(session*60);
+        var endTime=convertMinutesToHHMM((session*60)+Number(meetingDuration));
+        return {"startTime":startTime,"endTime":endTime};
+    }else if(durationAvailable != sessionDuration[index]){
+        var tempStartTime=(session*60)+(sessionDuration[index]-durationAvailable);
+        var startTime=convertMinutesToHHMM(tempStartTime);
+        var endTime=convertMinutesToHHMM(tempStartTime+Number(meetingDuration));
+        return {"startTime":startTime,"endTime":endTime};
+    }
+
+}
+
+//convert minutes to HH:MM format
 function convertMinutesToHHMM (minutes){
     var h = Math.floor(minutes / 60);
     var m = minutes % 60;
