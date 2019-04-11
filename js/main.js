@@ -19,12 +19,13 @@ var meetings = [
     { "organizer": "Tgb", "duration": "180" },
     { "organizer": "Okm", "duration": "240" }
 ],
-    meetingRooms = [],
     morningStart = 9,
     afternoonStart = 1,
-    morningSessionDuration=180,
-    afternoonSessionDuration=240,
+    morningSessionDuration = 180,
+    afternoonSessionDuration = 240,
+    meetingRooms = [],
     sessionDuration = [morningSessionDuration, afternoonSessionDuration];
+
 let sortedMeetings = meetings.slice(0).sort((a, b) => b.duration - a.duration);
 
 function start() {
@@ -36,7 +37,7 @@ function start() {
                 value["startTime"] = startEndTime.startTime;
                 value["endTime"] = startEndTime.endTime
                 value["time"] = "Morning";
-                rooms.durationAvaialble[0] = rooms.durationAvaialble[0] - Number(value.duration);;             
+                rooms.durationAvaialble[0] = rooms.durationAvaialble[0] - Number(value.duration);;
                 rooms.room.push(value);
                 return false;
             } else if (value.duration <= rooms.durationAvaialble[1]) {
@@ -53,7 +54,11 @@ function start() {
         })
 
     });
-    //display Logic
+
+    displayMeetings();
+}
+//Display meetings
+function displayMeetings() {
     $.each(meetingRooms, function (index, value) {
         if (value.room.length != 0) {
             $(".meeting").append("<h4>MEETING ROOM " + (index + 1) + "</h4>")
