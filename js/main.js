@@ -16,30 +16,22 @@ $(document).ready(function () {
         { "organizer": "Tgb", "duration": "180" },
         { "organizer": "Okm", "duration": "240" }
     ],
-        meetingRooms = [
-            { room: [], durationAvaialble: [180, 240] },
-            { room: [], durationAvaialble: [180, 240] },
-            { room: [], durationAvaialble: [180, 240] },
-            { room: [], durationAvaialble: [180, 240] },
-            { room: [], durationAvaialble: [180, 240] },
-            { room: [], durationAvaialble: [180, 240] }
-        ],
+        meetingRooms = [],
         morningStart = 9,
-        afternoonStart = 1;
+        afternoonStart = 1,
+        sessionDuration=[180, 240];
     
-        let sortedMeetings = meetings.slice(0).sort((a, b) => b.duration - a.duration);
-
+    let sortedMeetings = meetings.slice(0).sort((a, b) => b.duration - a.duration);
 
     $.each(sortedMeetings, function (index, value) {
-
-        $.each(meetingRooms, function (index, rooms) {
-
+        meetingRooms.push({ room: [], durationAvaialble: [180, 240] });       
+        $.each(meetingRooms, function (index, rooms) {            
             if (value.duration <= rooms.durationAvaialble[0]) {
-                if(rooms.durationAvaialble[0] == 180){
+                if(rooms.durationAvaialble[0] == sessionDuration[0]){
                     value["startTime"]=convertMinutesToHHMM(morningStart*60);
                     value["endTime"]=convertMinutesToHHMM((morningStart*60)+Number(value.duration));
-                }else if(rooms.durationAvaialble[0] != 180){
-                    var tempStartTime=(morningStart*60)+(180-rooms.durationAvaialble[0]);
+                }else if(rooms.durationAvaialble[0] != sessionDuration[0]){
+                    var tempStartTime=(morningStart*60)+(sessionDuration[0]-rooms.durationAvaialble[0]);
                     value["startTime"]=convertMinutesToHHMM(tempStartTime);
                     value["endTime"]=convertMinutesToHHMM(tempStartTime+Number(value.duration));
                 }
@@ -48,11 +40,11 @@ $(document).ready(function () {
                 rooms.room.push(value);
                 return false;
             } else if (value.duration <= rooms.durationAvaialble[1]) {
-                if(rooms.durationAvaialble[1] == 240){
+                if(rooms.durationAvaialble[1] == sessionDuration[1]){
                     value["startTime"]=convertMinutesToHHMM(afternoonStart*60);
                     value["endTime"]=convertMinutesToHHMM((afternoonStart*60)+Number(value.duration));
-                }else if(rooms.durationAvaialble[1] != 240){
-                    var tempStartTime=(afternoonStart*60)+(240-rooms.durationAvaialble[1]);
+                }else if(rooms.durationAvaialble[1] != sessionDuration[1]){
+                    var tempStartTime=(afternoonStart*60)+(sessionDuration[1]-rooms.durationAvaialble[1]);
                     value["startTime"]=convertMinutesToHHMM(tempStartTime);
                     value["endTime"]=convertMinutesToHHMM(tempStartTime+Number(value.duration));
                 }
